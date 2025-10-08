@@ -1,0 +1,52 @@
+name: Release Charts
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.0
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set version
+        id: version
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "version=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=0.0.0-latest" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update Chart version
+        run: |
+          sed -i "s/^version:.*/version: ${{ steps.version.outputs.version }}/" tailscale-egress/Chart.yaml
+
+      - name: Package and push chart
+        run: |
+          helm package tailscale-egress
+          helm push tailscale-egress-${{ steps.version.outputs.version }}.tgz oci://${{ env.REGISTRY }}/rajsinghtech/tailscale-k8s-operator-helper-charts

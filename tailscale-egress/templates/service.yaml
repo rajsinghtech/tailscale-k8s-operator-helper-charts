@@ -1,0 +1,40 @@
+{{- if and .Values.proxyGroup .Values.proxyClass }}
+{{- fail "Cannot set both proxyGroup and proxyClass - they are mutually exclusive" }}
+{{- end }}
+{{- if and .Values.proxyGroup .Values.tags }}
+{{- fail "Cannot set both proxyGroup and tags - set tags in the proxyGroup instead" }}
+{{- end }}
+{{- range .Values.services }}
+{{- if and $.Values.proxyGroup (not .ports) }}
+{{- fail (printf "Service '%s' must define ports when proxyGroup is set" .name) }}
+{{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  annotations:
+    {{- if .fqdn }}
+    tailscale.com/tailnet-fqdn: {{ .fqdn }}
+    {{- else if .ip }}
+    tailscale.com/tailnet-ip: {{ .ip }}
+    {{- end }}
+    {{- if $.Values.proxyGroup }}
+    tailscale.com/proxy-group: {{ $.Values.proxyGroup }}
+    {{- else if $.Values.proxyClass }}
+    tailscale.com/proxy-class: {{ $.Values.proxyClass }}
+    {{- end }}
+    {{- if and $.Values.tags (or (not $.Values.proxyGroup) $.Values.proxyClass) }}
+    tailscale.com/tags: {{ join "," $.Values.tags }}
+    {{- end }}
+spec:
+  externalName: placeholder
+  type: ExternalName
+  {{- if .ports }}
+  ports:
+  {{- range .ports }}
+  - port: {{ .port }}
+    protocol: {{ .protocol }}
+  {{- end }}
+  {{- end }}
+{{- end }}
