@@ -1,23 +1,24 @@
-proxyGroup: "group"
+# proxyGroup: "common-egress"
 # proxyClass: "class"
 # tags:
 #   - "tag:test1"
 #   - "tag:test2"
-services:
-  - name: robbinsdale-k8s-operator
-    fqdn: robbinsdale-k8s-operator.keiretsu.ts.net
-    ports:
-      - port: 443
-        protocol: TCP
-  - name: ottawa-k8s-operator
-    fqdn: ottawa-k8s-operator.keiretsu.ts.net
-    ports:
-      - port: 443
-        protocol: TCP
-  - name: ottawa-envoy-gateway
-    ip: 10.169.10.15
-    ports:
-      - port: 443
-        protocol: TCP
-      - port: 80
-        protocol: TCP
+# services:
+#   - name: robbinsdale-k8s-operator
+#     fqdn: robbinsdale-k8s-operator.keiretsu.ts.net
+#     ports:
+#       - port: 443
+#         name: https
+#         protocol: TCP
+#   - name: ottawa-k8s-operator
+#     fqdn: ottawa-k8s-operator.keiretsu.ts.net
+#     ports:
+#       - port: 443
+#         protocol: TCP
+#   - name: ottawa-envoy-gateway
+#     ip: 10.169.10.15
+#     ports:
+#       - port: 443
+#         protocol: TCP
+#       - port: 80
+#         protocol: TCP

@@ -32,9 +32,10 @@ spec:
   type: ExternalName
   {{- if .ports }}
   ports:
-  {{- range .ports }}
-  - port: {{ .port }}
-    protocol: {{ .protocol }}
+  {{- range $index, $port := .ports }}
+  - name: {{ $port.name | default (printf "port-%d" $index) }}
+    port: {{ $port.port }}
+    protocol: {{ $port.protocol }}
   {{- end }}
   {{- end }}
 {{- end }}
