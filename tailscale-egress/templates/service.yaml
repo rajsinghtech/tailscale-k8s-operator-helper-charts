@@ -14,6 +14,7 @@ kind: Service
 metadata:
   name: {{ .name }}
   annotations:
+    kustomize.toolkit.fluxcd.io/ssa: merge
     {{- if .fqdn }}
     tailscale.com/tailnet-fqdn: {{ .fqdn }}
     {{- else if .ip }}
